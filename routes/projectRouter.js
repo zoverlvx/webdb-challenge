@@ -20,4 +20,21 @@ router.get("/:id", (req, res) => {
       }).catch(err => handleRes(res, 500, err))
 })
 
+router.post("/", (req, res) => {
+    const {name, description} = req.body;
+    if (!name || !description) {
+	handleRes(res, 400, {success: false, message: "Must provide a name and description"});
+    }
+    if (typeof name !== "string" || typeof description !== "string") {
+	handleRes(res, 400, {success: false, message: "Name and description must both be strings"});
+    }
+    if (typeof name === "string" && typeof description === "string") {
+        db("projects").insert({name, description}, "id")
+	.then(ids => {
+	    const [id] = ids;
+	    handleRes(res, 201, {success: true, id});
+	}).catch(err => handleRes(res, 500, err))
+    }
+});
+
 module.exports = router;
