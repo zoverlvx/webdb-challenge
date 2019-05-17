@@ -12,7 +12,13 @@ router.get("/:id", (req, res) => {
     db("projects").where({id: req.params.id}).first()
       .then(project => {
 	  if(project) {
-	      handleRes(res, 200, {success: true, project});
+	      const {id, name, description} = project;
+	      db("actions").where("project_id", req.params.id)
+		.then(
+		    actions => handleRes(
+			    res, 200, {project: {id, name, description, actions:[...actions]}}
+		    )
+		)
 	  }
 	  if(!project) {
 	      handleRes(res, 404, {success: false, message: `Project with id of ${req.params.id} not found`})
